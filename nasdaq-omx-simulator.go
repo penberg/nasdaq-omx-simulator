@@ -5,15 +5,26 @@ import (
 	"bytes"
 	"code.google.com/p/go.net/ipv4"
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"net"
 	"os"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
 func main() {
-	filename := os.Args[1]
+	fastForward := flag.Bool("ff", false, "fast forward, don't simulate timing)")
+
+	flag.Parse()
+
+	if flag.NArg() != 1 {
+		flag.Usage()
+		os.Exit(1)
+	}
+	filename := flag.Arg(0)
+
 	fmt.Printf("NASDAQ OMX simulator\n\n")
 	fmt.Printf("=> Replaying file %s...\n", filename)
 	fi, err := os.Stat(filename)
@@ -60,11 +71,39 @@ func main() {
 
 	seqNo := uint32(0)
 	offset := 0
+	nowSeconds := uint64(0)
+	nowMilliseconds := uint64(0)
 	for {
 		if offset >= int(fi.Size()) {
 			break
 		}
 		ch := mmap[offset]
+		if !*fastForward {
+			switch ch {
+			case 'T':
+				var m *Seconds = (*Seconds)(unsafe.Pointer(&mmap[offset]))
+				secs := ItchUatoi(m.Second[:], 5)
+				if nowSeconds != 0 {
+					duration := secs - nowSeconds
+					// No need to sleep for more than 1 seconds:
+					if duration > 1 {
+						duration = 1
+					}
+					duration = duration*1000 - nowMilliseconds
+					time.Sleep(time.Duration(duration) * time.Millisecond)
+				}
+				nowSeconds = secs
+				nowMilliseconds = 0
+			case 'M':
+				var m *Milliseconds = (*Milliseconds)(unsafe.Pointer(&mmap[offset]))
+				millis := ItchUatoi(m.Millisecond[:], 3)
+				if nowMilliseconds != 0 {
+					duration := millis - nowMilliseconds
+					time.Sleep(time.Duration(duration) * time.Millisecond)
+				}
+				nowMilliseconds = millis
+			}
+		}
 		seqNo += 1
 		buf := new(bytes.Buffer)
 		header := MoldUDPHeader{

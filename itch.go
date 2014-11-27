@@ -132,3 +132,20 @@ type NOII struct {
 	BestAskPrice       [10]byte
 	BestAskQuantity    [9]byte
 }
+
+func ItchUatoi(buf []byte, len int) uint64 {
+	var ret uint64 = 0
+	var idx int = 0
+	for idx < len {
+		if buf[idx] != ' ' {
+			break
+		}
+		idx++
+	}
+	for idx < len {
+		ch := buf[idx]
+		ret = (ret * 10) + uint64(ch-byte('0'))
+		idx += 1
+	}
+	return ret
+}
