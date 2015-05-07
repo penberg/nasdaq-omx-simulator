@@ -17,6 +17,8 @@ import (
 func main() {
 	fastForward := flag.Bool("ff", false, "fast forward, don't simulate timing)")
 
+	iface := flag.String("iface", "lo", "multicast interface")
+
 	flag.Parse()
 
 	if flag.NArg() != 1 {
@@ -47,7 +49,7 @@ func main() {
 	}
 	defer c.Close()
 
-	ifi, err := net.InterfaceByName("lo")
+	ifi, err := net.InterfaceByName(*iface)
 	if err != nil {
 		panic(err)
 	}
