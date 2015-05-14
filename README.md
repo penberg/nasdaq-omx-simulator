@@ -1,6 +1,6 @@
 # NASDAQ OMX simulator
 
-NASDAQ OMX simulator that replays NASDAQ OMX Nordic TotalView ITCH SoapFILE
+NASDAQ OMX simulator that replays NASDAQ OMX Nordic TotalView ITCH SoupFILE
 files over MoldUDP protocol.
 
 ## Installation
