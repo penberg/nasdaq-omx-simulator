@@ -15,9 +15,11 @@ import (
 )
 
 func main() {
-	fastForward := flag.Bool("ff", false, "fast forward, don't simulate timing)")
+	addr := flag.String("addr", "233.74.125.41:31041", "UDP multicast address")
 
 	iface := flag.String("iface", "lo", "multicast interface")
+
+	fastForward := flag.Bool("ff", false, "fast forward, don't simulate timing)")
 
 	flag.Parse()
 
@@ -43,7 +45,7 @@ func main() {
 	}
 	defer syscall.Munmap(mmap)
 
-	c, err := net.ListenPacket("udp4", "233.74.125.41:31041")
+	c, err := net.ListenPacket("udp4", *addr)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +56,7 @@ func main() {
 		panic(err)
 	}
 
-	dst, err := net.ResolveUDPAddr("udp4", "233.74.125.41:31041")
+	dst, err := net.ResolveUDPAddr("udp4", *addr)
 	if err != nil {
 		panic(err)
 	}
