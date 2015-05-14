@@ -1,3 +1,12 @@
+// Nordic Equity TotalView ITCH protocol
+//
+// This implementation is based on the following specification provided by
+// NASDAQ OMX:
+//
+//   Nordic Equity TotalView-ITCH
+//   Version 1.90.2
+//   April 7, 2014
+
 package main
 
 type Seconds struct {
